@@ -2,38 +2,98 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "default",
+      "name": "common",
+      "hidden": true,
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": {
+          "type": "BOOL",
+          "value": "ON"
+        }
+      }
+    },
+    {
+      "name": "system",
+      "inherits": "common",
       "description": "Generate Ninja project files",
       "generator": "Ninja Multi-Config",
       "binaryDir": "${sourceDir}/build"
     },
     {
       "name": "vcpkg",
-      "inherits": [
-        "default"
-      ],
+      "inherits": "common",
       "description": "Configure with vcpkg toolchain and generate Ninja project files",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+    },
+    {
+      "name": "visualstudio-common",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "BUILD_TESTING": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "Windows" ]
+        }
+      }
+    },
+    {
+      "name": "visualstudio-debug",
+      "inherits": [ "visualstudio-common", "vcpkg" ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "visualstudio-release",
+      "inherits": [ "visualstudio-common", "vcpkg" ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
     }
   ],
   "buildPresets": [
     {
-      "name": "default",
-      "configurePreset": "default"
+      "name": "system",
+      "configurePreset": "system"
     },
     {
       "name": "vcpkg",
       "configurePreset": "vcpkg"
+    },
+    {
+      "name": "visualstudio-debug",
+      "configurePreset": "visualstudio-debug"
+    },
+    {
+      "name": "visualstudio-release",
+      "configurePreset": "visualstudio-release"
     }
   ],
   "testPresets": [
     {
-      "name": "default",
-      "configurePreset": "default"
+      "name": "common",
+      "hidden": true,
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "system",
+      "inherits": "common",
+      "configurePreset": "system"
     },
     {
       "name": "vcpkg",
-      "configurePreset": "vcpkg"
+      "inherits": "common",
+      "configurePreset": "vcpkg"     
     }
   ]
 }
