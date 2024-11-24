@@ -12,7 +12,6 @@
 #include "monster.h"
 #include "party.h"
 #include "scheduler.h"
-#include "spectators.h"
 
 double Creature::speedA = 857.36;
 double Creature::speedB = 261.29;
@@ -316,7 +315,7 @@ void Creature::stopEventWalk()
 
 void Creature::updateIcons() const
 {
-	SpectatorVec spectators;
+	Spectators spectators;
 	g_game.map.getSpectators(spectators, position, true, true);
 	for (Creature* spectator : spectators) {
 		assert(dynamic_cast<Player*>(spectator) != nullptr);
@@ -943,7 +942,7 @@ void Creature::onGainExperience(uint64_t gainExp, Creature* target)
 	gainExp /= 2;
 	master->onGainExperience(gainExp, target);
 
-	SpectatorVec spectators;
+	Spectators spectators;
 	g_game.map.getSpectators(spectators, position, false, true);
 	if (spectators.empty()) {
 		return;
